@@ -1,12 +1,5 @@
-static final float INITIAL_UPDATE_THRESHOLD = 0.5f;
-static float updateThreshold = INITIAL_UPDATE_THRESHOLD;
-
-static boolean moveInvadersLeft = true;
-
 class Invader
-{
-    
-  
+{  
     float x;
     float y;
     
@@ -34,8 +27,10 @@ class Invader
         {
           elapsed -= updateThreshold;
         
-          if(moveInvadersLeft) x -= INVADER_WIDTH / 2f;
-          else                 x += INVADER_WIDTH / 2f;
+          if(moveInvadersLeft) 
+            x -= INVADER_WIDTH / 2f;
+          else                 
+            x += INVADER_WIDTH / 2f;
         }
         else
         {
@@ -43,7 +38,7 @@ class Invader
         }
     }
     
-    void render()
+    void draw()
     {
       if(isAlive)
       {

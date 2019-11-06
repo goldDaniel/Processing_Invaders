@@ -1,6 +1,5 @@
 class Bullet
 {
-
     private boolean active = false;
 
     final float SPEED = SCREEN_HEIGHT;
@@ -31,7 +30,7 @@ class Bullet
         }
     }
 
-    void render()
+    void draw()
     {
         if(active)
         {

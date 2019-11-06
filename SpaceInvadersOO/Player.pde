@@ -1,6 +1,5 @@
 class Player
 {
-  
     private float speed = SCREEN_WIDTH;
 
     float x;
@@ -36,7 +35,7 @@ class Player
         }
     }
 
-    void render()
+    void draw()
     {
         fill(0, 1f, 1f);
         rect(x, y,  WIDTH, HEIGHT);

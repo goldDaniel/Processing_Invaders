@@ -1,28 +1,58 @@
+//to calculate delta time/////////////////////////////////////
 float prevTime;
+//to calculate delta time/////////////////////////////////////
+
+//SCREEN BOUND VARIABLES//////////////////////////////////////
 int SCREEN_WIDTH = 800;
 int SCREEN_HEIGHT = 600; 
+//SCREEN BOUND VARIABLES//////////////////////////////////////
 
+
+//GLOBALS FOR INVADERS///////////////////////////////////////
 Invader[][] invaders;
 
+static PImage invaderImage;
+
+static final float INITIAL_UPDATE_THRESHOLD = 0.5f;
+static float updateThreshold = INITIAL_UPDATE_THRESHOLD;
+static boolean moveInvadersLeft = true;
+//GLOBALS FOR INVADERS///////////////////////////////////////
+
 Player player;
+
 Bullet bullet;
 
 
 void setup()
 {
+  //sets our screen size
   size(800, 600);
 
+  //makes images not blurry
   smooth(0);
-  colorMode(HSB, 360f, 1f, 1f, 1f);
+  
+  colorMode(HSB, 360f, 1f, 1f);
 
+  //loads our image files
   initAssets();
+
+  //initializes space invader assets
   initInvaders();
   
+  //creates bullet
   bullet = new Bullet();
+
+  //creates player
   player = new Player();
   
   prevTime = millis();
 }
+
+void initAssets()
+{
+   invaderImage = loadImage("Invader.png"); 
+}
+
 
 void draw()
 {
@@ -31,9 +61,22 @@ void draw()
   prevTime = currentTime;
 
   update(dt);
-  render();
-}
+  
+  
+  background(0);
+  for(int i = 0; i < invaders.length; i++)
+  {
+    for(int j = 0; j < invaders[i].length; j++)
+    {
+      invaders[i][j].draw();
+    }
+  }
 
+  bullet.draw();
+  player.draw();
+}
+ 
+ 
 void update(float dt)
 {
   updateInvaders(dt); 
@@ -53,11 +96,16 @@ void update(float dt)
 
 void doBulletCollisions()
 {
+  //this lets us exit the loop early once we have detected collision
   boolean collision = false;
   for(int i = 0; i < invaders.length && !collision; i++)
   {
     for(int j = 0; j < invaders[i].length && !collision; j++)
     {
+      //if the invader is alive, 
+      //we check to see if the bullet rectangle is inside one of the invaders
+      //if it is, we set the bullet to inactive and 
+      //set the invaders isAlive value to false
       if(invaders[i][j].isAlive)
       {
         if(bullet.x < invaders[i][j].x + Invader.INVADER_WIDTH &&
@@ -74,25 +122,10 @@ void doBulletCollisions()
   }
 }
 
-void render()
-{
-  background(0);
-  for(int i = 0; i < invaders.length; i++)
-  {
-    for(int j = 0; j < invaders[i].length; j++)
-    {
-      invaders[i][j].render();
-    }
-  }
-
-  bullet.render();
-  player.render();
-}
-
-
-
 void initInvaders()
 {
+  //creates a new grid of invaders, 
+  //and spaces them evenly in the middle of the screen
   int invadersX = 8;
   int invadersY = 5;
   invaders = new Invader[invadersX][invadersY];
@@ -111,8 +144,10 @@ void initInvaders()
 
 void updateInvaders(float dt)
 {
+  //we use these 2 variables to calculate the invader movement speed 
   float initialInvaders = invaders.length * invaders[0].length;
   float currInvaders = 0;
+  
   //UPDATE INVADERS//////////////////////////////////////////////////////
   for(int i = 0; i < invaders.length; i++)
   {
@@ -126,8 +161,11 @@ void updateInvaders(float dt)
     }
   }
 
-  updateThreshold = currInvaders / initialInvaders * INITIAL_UPDATE_THRESHOLD;  
-
+  //this increases the speed the invaders move as less are alive
+  float percentageOfInvadersAlive = currInvaders / initialInvaders;
+  updateThreshold = percentageOfInvadersAlive * INITIAL_UPDATE_THRESHOLD;  
+  
+  //if we are moving the invaders left we only check collisions with the left hand side
   if(moveInvadersLeft)
   {
     boolean complete = false;
@@ -145,6 +183,7 @@ void updateInvaders(float dt)
       } 
     }
   }
+  //if we are moving the invaders right we only check collisions with the right hand side 
   else
   {
     boolean complete = false;
