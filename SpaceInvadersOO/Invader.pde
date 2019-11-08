@@ -1,22 +1,16 @@
-class Invader
+class Invader extends Entity
 {  
-    float x;
-    float y;
-    
     color c;
     
     boolean isAlive = true;
     
-    static final int INVADER_WIDTH  = 32;
-    static final int INVADER_HEIGHT = 32;
-
-    
     float elapsed = 0;
+  
+  
   
     Invader(float x, float y, color c)
     {
-      this.x = x;
-      this.y = y;
+      super(x, y, 32f, 32f);
       
       this.c = c;
     }
@@ -28,9 +22,9 @@ class Invader
           elapsed -= updateThreshold;
         
           if(moveInvadersLeft) 
-            x -= INVADER_WIDTH / 2f;
+            x -= WIDTH / 2f;
           else                 
-            x += INVADER_WIDTH / 2f;
+            x += WIDTH / 2f;
         }
         else
         {
@@ -43,7 +37,7 @@ class Invader
       if(isAlive)
       {
         tint(c);
-        image(invaderImage, x, y, INVADER_WIDTH, INVADER_HEIGHT);
+        image(invaderImage, x, y, WIDTH, HEIGHT);
       }
     }
 }

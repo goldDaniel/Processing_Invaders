@@ -1,14 +1,13 @@
-class Bullet
+class Bullet extends Entity
 {
     private boolean active = false;
 
     final float SPEED = SCREEN_HEIGHT;
-
-    float x = -100;
-    float y = -100;
-
-    final float WIDTH = 8;
-    final float HEIGHT = 32;
+    
+    Bullet()
+    {
+      super(-100, -100, 8, 32);  
+    }
 
     void fire(float x, float y)
     {
@@ -27,6 +26,13 @@ class Bullet
             y -= SPEED * dt;
 
             if(y < 0) active = false;
+        }
+        else
+        {
+            if(Input.key_space)
+            {
+                bullet.fire(player.x + player.WIDTH / 2, player.y);
+            }
         }
     }
 

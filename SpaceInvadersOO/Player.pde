@@ -1,17 +1,11 @@
-class Player
+class Player extends Entity
 {
     private float speed = SCREEN_WIDTH;
 
-    float x;
-    float y;
-
-    final float WIDTH = 32;
-    final float HEIGHT = 32;
 
     Player()
     {
-        x = SCREEN_WIDTH /  2 - WIDTH / 2;
-        y = SCREEN_HEIGHT - HEIGHT;
+        super(SCREEN_WIDTH / 2 - 16, SCREEN_HEIGHT - 32, 32, 32);
     }
 
     void update(float dt)

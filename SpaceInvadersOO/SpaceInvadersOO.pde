@@ -22,6 +22,7 @@ Player player;
 
 Bullet bullet;
 
+Shield[] shields;
 
 void setup()
 {
@@ -31,7 +32,7 @@ void setup()
   //makes images not blurry
   smooth(0);
   
-  colorMode(HSB, 360f, 1f, 1f);
+  colorMode(HSB, 360f, 1f, 1f, 1f);
 
   //loads our image files
   initAssets();
@@ -44,6 +45,15 @@ void setup()
 
   //creates player
   player = new Player();
+  
+  
+  int numShields = 4;
+  shields = new Shield[numShields];
+  for(int i = 0; i < shields.length; i++)
+  {
+    float increment = 1f / (numShields + 1);
+    shields[i] = new Shield(increment * (i + 1) * SCREEN_WIDTH - 32, SCREEN_HEIGHT * 4f / 5f);  
+  }
   
   prevTime = millis();
 }
@@ -72,6 +82,11 @@ void draw()
     }
   }
 
+  for(int i = 0; i < shields.length; i++)
+  {
+    shields[i].draw();  
+  }
+  
   bullet.draw();
   player.draw();
 }
@@ -81,16 +96,16 @@ void update(float dt)
 {
   updateInvaders(dt); 
   player.update(dt);
-
-  if(Input.key_space)
-  {
-    bullet.fire(player.x + player.WIDTH / 2, player.y);
-  }
-
+  
   bullet.update(dt);
   if(bullet.active)
   {  
     doBulletCollisions();
+  }
+  
+  for(int i = 0; i < shields.length; i++)
+  {
+    shields[i].update(dt);  
   }
 }
 
@@ -108,15 +123,12 @@ void doBulletCollisions()
       //set the invaders isAlive value to false
       if(invaders[i][j].isAlive)
       {
-        if(bullet.x < invaders[i][j].x + Invader.INVADER_WIDTH &&
-           bullet.x + bullet.WIDTH > invaders[i][j].x && 
-           bullet.y < invaders[i][j].y + Invader.INVADER_HEIGHT &&
-           bullet.y + bullet.HEIGHT > invaders[i][j].y)
-         {
-            collision = true;
-            bullet.active = false;
-            invaders[i][j].isAlive = false;
-         }
+        if(bullet.isColliding(invaders[i][j]))
+        {
+          collision = true;
+          bullet.active = false;
+          invaders[i][j].isAlive = false;
+        }
       }
     }
   }
@@ -126,16 +138,20 @@ void initInvaders()
 {
   //creates a new grid of invaders, 
   //and spaces them evenly in the middle of the screen
-  int invadersX = 8;
+  int invadersX = 12;
   int invadersY = 5;
+  
+  float invaderWidth = 32;
+  float invaderHeight = 32;
+  
   invaders = new Invader[invadersX][invadersY];
   for(int i = 0; i < invadersX; i++)
   {
     for(int j = 0; j < invadersY; j++)
     {
-      float x = i * Invader.INVADER_WIDTH * 1.5f;
+      float x = i * invaderWidth * 1.25f;
       x += SCREEN_WIDTH / 4f;
-      float y = j * Invader.INVADER_HEIGHT * 1.5f;
+      float y = j * invaderHeight * 1.25f;
       y += SCREEN_HEIGHT/ 8f;
       invaders[i][j] = new Invader(x, y, color(float(j) / (invadersY) * 360f, 1f, 1f));
     }
@@ -191,7 +207,7 @@ void updateInvaders(float dt)
     {
       for(int j = 0; j < invaders[i].length && !complete; j++)
       {
-        if(invaders[i][j].isAlive && invaders[i][j].x + Invader.INVADER_WIDTH >= SCREEN_WIDTH)
+        if(invaders[i][j].isAlive && invaders[i][j].x + invaders[i][j].WIDTH >= SCREEN_WIDTH)
         {
           complete = true;
           moveInvadersLeft = true;
@@ -200,7 +216,7 @@ void updateInvaders(float dt)
         }
       } 
     }
-  }bullet.update(dt);
+  }
 }
 
 void moveInvadersDown()
@@ -209,7 +225,7 @@ void moveInvadersDown()
   {
     for(int j = 0; j < invaders[i].length; j++)
     {
-      invaders[i][j].y += Invader.INVADER_HEIGHT / 2f;
+      invaders[i][j].y += invaders[i][j].HEIGHT / 2f;
     } 
   }
 }
