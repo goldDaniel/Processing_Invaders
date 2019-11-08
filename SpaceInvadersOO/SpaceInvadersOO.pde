@@ -1,6 +1,8 @@
-//to calculate delta time/////////////////////////////////////
+//GAMESTATE VARIABLES/////////////////////////////////////
 float prevTime;
-//to calculate delta time/////////////////////////////////////
+
+boolean gameOver = false;
+//GAMESTATE VARIABLES/////////////////////////////////////
 
 //SCREEN BOUND VARIABLES//////////////////////////////////////
 int SCREEN_WIDTH = 800;
@@ -70,9 +72,12 @@ void draw()
   float dt = (currentTime - prevTime) / 1000f;
   prevTime = currentTime;
 
-  update(dt);
+  if(!gameOver)
+  {
+    update(dt);
+  }
   
-  
+  //DRAW GAME//////////////////////////////////////////////////////////
   background(0);
   for(int i = 0; i < invaders.length; i++)
   {
@@ -89,6 +94,38 @@ void draw()
   
   bullet.draw();
   player.draw();
+  
+  //if the game is over we draw the end text
+  if(gameOver)
+  {
+    boolean win = true;
+    //count alive invaders so we can see tell if we won or not
+    for(int i = 0; i < invaders.length && win; i++)
+    {
+      for(int j = 0; j < invaders[i].length && win; j++)
+      {
+        if(invaders[i][j].isAlive)
+        {
+          win = false;
+        }
+      }
+    }
+    
+     textAlign(CENTER);
+     fill(0f, 0f, 1f);
+     textSize(64);
+     text("GAME OVER", SCREEN_WIDTH / 2, SCREEN_HEIGHT/ 2);
+     
+     if(win)
+     {
+       text("YOU WIN!", SCREEN_WIDTH / 2, SCREEN_HEIGHT/ 2 + 64);
+     }
+     else
+     {
+       text("YOU LOSE!", SCREEN_WIDTH / 2, SCREEN_HEIGHT/ 2 + 64);
+     }  
+  }
+  //DRAW GAME//////////////////////////////////////////////////////////
 }
  
  
@@ -107,6 +144,7 @@ void update(float dt)
   {
     shields[i].update(dt);  
   }
+  
 }
 
 void doBulletCollisions()
@@ -173,50 +211,74 @@ void updateInvaders(float dt)
       {
         invaders[i][j].update(dt);
         currInvaders++;
+        
+        if(player.isColliding(invaders[i][j]))
+        {
+          gameOver = true;
+        }
       }
     }
   }
-
+  
   //this increases the speed the invaders move as less are alive
   float percentageOfInvadersAlive = currInvaders / initialInvaders;
   updateThreshold = percentageOfInvadersAlive * INITIAL_UPDATE_THRESHOLD;  
   
+  
   //if we are moving the invaders left we only check collisions with the left hand side
   if(moveInvadersLeft)
   {
-    boolean complete = false;
-    for(int i = 0; i < invaders.length && !complete; i++)
-    {
-      for(int j = 0; j < invaders[i].length && !complete; j++)
-      {
-        if(invaders[i][j].isAlive && invaders[i][j].x <= 0)
-        {
-          complete = true;
-          moveInvadersLeft = false;
-
-          moveInvadersDown();
-        }
-      } 
-    }
+    checkInvadersLeftCollision();
+    
   }
   //if we are moving the invaders right we only check collisions with the right hand side 
   else
   {
-    boolean complete = false;
-    for(int i = 0; i < invaders.length && !complete; i++)
-    {
-      for(int j = 0; j < invaders[i].length && !complete; j++)
-      {
-        if(invaders[i][j].isAlive && invaders[i][j].x + invaders[i][j].WIDTH >= SCREEN_WIDTH)
-        {
-          complete = true;
-          moveInvadersLeft = true;
-
-          moveInvadersDown();
-        }
-      } 
-    }
+    checkInvaderRightCollision();
+    
   }
+  
+  if(currInvaders == 0)
+  {
+    gameOver = true;
+  }
+}
+
+
+void checkInvadersLeftCollision()
+{
+  boolean complete = false;
+  for(int i = 0; i < invaders.length && !complete; i++)
+  {
+    for(int j = 0; j < invaders[i].length && !complete; j++)
+    {
+      if(invaders[i][j].isAlive && invaders[i][j].x <= 0)
+      {
+        complete = true;
+        moveInvadersLeft = false;
+
+        moveInvadersDown();
+      }
+    } 
+  } 
+}
+
+void checkInvaderRightCollision()
+{
+  boolean complete = false;
+  for(int i = invaders.length - 1; i >= 0 && !complete; i--)
+  {
+    for(int j = 0; j < invaders[i].length && !complete; j++)
+    {
+      if(invaders[i][j].isAlive && invaders[i][j].x + invaders[i][j].WIDTH >= SCREEN_WIDTH)
+      {
+        complete = true;
+        moveInvadersLeft = true;
+
+        moveInvadersDown();
+      }
+    } 
+  }  
 }
 
 void moveInvadersDown()
